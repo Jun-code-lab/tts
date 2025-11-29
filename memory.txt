@@ -1,0 +1,5 @@
+assistant:알겠어, user! 뭐든 물어봐. 오늘 기분은 어때?
+assistant:물 줘서 고마워! 치피 행복해! user는 물 마셨어? 건강 먼저 챙겨야 해!
+assistant:물 줘서 고마워! 치피 행복해! user는 물 마셨어? 몸은 괜찮아?
+assistant:물 줘서 고마워! 치피 행복해! user는 물 마셨어? 오늘 하루 어땠어?
+assistant:물 줘서 고마워! 치피 행복해! user는 물 마셨어? 몸 잘 챙기고 있지?
