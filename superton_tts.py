@@ -75,6 +75,7 @@ class SupertonTTS:
 
         try:
             print(f"🔊 음성 생성 중: {text[:20]}...", end=" ", flush=True)
+            print(f"\n   📤 요청 스타일: {style}", flush=True)
 
             response = requests.post(url, json=payload, headers=headers, timeout=30)
 
