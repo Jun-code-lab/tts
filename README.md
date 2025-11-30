@@ -26,6 +26,8 @@ tts/
 ├── voice/                        # 음성 파일
 └── README.md                     # 이 파일
 ```
+   <img width="685" height="613" alt="image" src="https://github.com/user-attachments/assets/0c35a684-d8be-4505-9240-6f806a73ede9" />
+
 
 ## 🎙️ TTS 엔진 지원
 
