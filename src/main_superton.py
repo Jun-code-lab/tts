@@ -1,5 +1,9 @@
 import os
 import sys
+
+# 경로 설정 (src 폴더에서 실행되므로 상위 폴더 추가)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from dotenv import load_dotenv
 from src.core.chipi_brain import ChipiBrain
 from src.tts.superton_tts import SupertonTTS
@@ -9,7 +13,7 @@ from src.tts.superton_tts import SupertonTTS
 sys.stdout.reconfigure(encoding='utf-8')
 
 def main():
-    load_dotenv()
+    load_dotenv('config/.env')
 
     device_serial = os.environ.get("DEVICE_SERIAL")
     if not device_serial:

@@ -1,0 +1,22 @@
+# ==========================================
+# Chipi TTS 프로젝트 의존성
+# ==========================================
+
+# Core Dependencies
+python-dotenv>=1.0.0          # 환경 변수 관리
+requests>=2.28.0              # HTTP 요청
+
+# LLM & AI
+openai>=1.0.0                 # Azure OpenAI API
+
+# Speech & Audio
+azure-cognitiveservices-speech>=1.31.0  # Azure Speech SDK (STT/TTS)
+pygame>=2.1.0                 # 음성 재생
+
+# Database
+psycopg2-binary>=2.9.0        # PostgreSQL 드라이버
+
+# Development (선택사항)
+# pytest>=7.0.0                # 테스트 프레임워크
+# black>=23.0.0                # 코드 포매팅
+# pylint>=2.0.0                # 코드 린팅
