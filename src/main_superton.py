@@ -1,8 +1,8 @@
 import os
 import sys
 from dotenv import load_dotenv
-from chipi_brain import ChipiBrain
-from superton_tts import SupertonTTS
+from src.core.chipi_brain import ChipiBrain
+from src.tts.superton_tts import SupertonTTS
 
 
 # 한글 출력 깨짐 방지

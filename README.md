@@ -2,6 +2,31 @@
 
 음성 합성과 음성 인식을 통한 대화형 AI 시스템
 
+## 📁 프로젝트 구조
+
+```
+tts/
+├── src/                          # 소스 코드
+│   ├── core/                     # 핵심 로직
+│   │   └── chipi_brain.py       # LLM(Azure OpenAI) 관리
+│   ├── tts/                      # 음성 관련
+│   │   ├── superton_tts.py      # SuperTone API TTS
+│   │   ├── tts_engine.py        # Azure TTS
+│   │   ├── tts.py
+│   │   └── livetts.py
+│   ├── database/                 # 데이터베이스
+│   │   └── db_manager.py        # PostgreSQL 관리
+│   ├── main_superton.py         # 메인 앱 (SuperTone)
+│   └── main.py                  # 메인 앱 (Azure)
+├── tests/                        # 테스트
+│   ├── test.py
+│   └── test_tone_selection.py
+├── config/                       # 설정
+│   └── .env                     # 환경 변수
+├── voice/                        # 음성 파일
+└── README.md                     # 이 파일
+```
+
 ## 🎙️ TTS 엔진 지원
 
 ### 1. Azure TTS (`tts_engine.py`, `main.py`)

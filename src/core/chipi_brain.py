@@ -6,11 +6,11 @@ sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 import os
 from dotenv import load_dotenv
 from openai import AzureOpenAI
-from db_manager import DatabaseManager
+from src.database.db_manager import DatabaseManager
 
 class ChipiBrain:
     def __init__(self):
-        load_dotenv(encoding='utf-8')
+        load_dotenv('config/.env', encoding='utf-8')
 
         # ==========================================
         # 1. Azure OpenAI 설정
