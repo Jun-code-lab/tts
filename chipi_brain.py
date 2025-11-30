@@ -122,6 +122,41 @@ class ChipiBrain:
             ai_name: AI 페르소나 이름 (chipi, jarvis_4 등)
             device_serial: 디바이스 시리얼 (DB 컨텍스트 추가용, 선택사항)
         """
+        # 0. 최근 사용자 메시지 가져오기
+        last_user_msg = ""
+        for msg in reversed(self.messages):
+            if msg.get("role") == "user":
+                last_user_msg = msg.get("content", "").lower()
+                break
+
+        # 0-1. 특정 상황 감지 및 시스템 프롬프트 수정 (LLM이 다양하게 응답하도록)
+        user_name = None
+        special_context = ""
+
+        if device_serial and self.db_manager:
+            user_info = self.db_manager.get_user_by_device_serial(device_serial)
+            user_name = user_info.get('name') if user_info else None
+
+        # 물 주기 표현 감지
+        if any(k in last_user_msg for k in ["물 줄게", "물 줘", "물을 줄게", "물을 줘"]):
+            special_context += "## 특별 상황: user가 물을 주려고 해!\n감사를 표현하고 user의 건강을 먼저 생각해줘. 다양하게 응답해.\n"
+
+        # 온도 질문 감지 ("온도 어때?", "지금 온도?" 등)
+        has_temp_keyword = any(k in last_user_msg for k in ["온도", "따뜻", "더워", "추워"])
+        if has_temp_keyword and "습도" not in last_user_msg:
+            sensor_data = self.db_manager.get_sensor_data_by_serial(device_serial)
+            if sensor_data and sensor_data.get('temperature') is not None:
+                temp = sensor_data.get('temperature')
+                special_context += f"## 특별 상황: user가 온도를 묻고 있어!\n현재 온도는 {temp}도야. 이 정보를 바탕으로 다양하게 응답해.\n"
+
+        # 습도 질문 감지 ("습도 어때?", "지금 습도?" 등)
+        has_humidity_keyword = any(k in last_user_msg for k in ["습도", "건조", "말라"])
+        if has_humidity_keyword and "온도" not in last_user_msg:
+            sensor_data = self.db_manager.get_sensor_data_by_serial(device_serial)
+            if sensor_data and sensor_data.get('humidity') is not None:
+                humidity = sensor_data.get('humidity')
+                special_context += f"## 특별 상황: user가 습도를 묻고 있어!\n현재 습도는 {humidity}%야. 이 정보를 바탕으로 다양하게 응답해.\n"
+
         # 1. 선택된 AI의 시스템 프롬프트 가져오기
         system_prompt = self.system_prompts.get(
             ai_name, "You are a helpful assistant. Respond in Korean."
@@ -129,15 +164,7 @@ class ChipiBrain:
 
         # 2. DB 컨텍스트 추가 (device_serial이 있을 경우)
         db_context = ""
-        user_name = None
         if device_serial and self.db_manager:
-            # 최근 사용자 메시지에서 온도/습도 질문 감지
-            last_user_msg = ""
-            for msg in reversed(self.messages):
-                if msg.get("role") == "user":
-                    last_user_msg = msg.get("content", "").lower()
-                    break
-
             # 온도 또는 습도만 묻는지 확인
             has_temp_keyword = any(k in last_user_msg for k in ["온도", "따뜻", "더워", "추워"])
             has_humidity_keyword = any(k in last_user_msg for k in ["습도", "건조", "말라"])
@@ -161,6 +188,15 @@ class ChipiBrain:
             print(f"📝 DB 컨텍스트 추가됨 (길이: {len(db_context)}자)")
         else:
             print(f"⚠️  DB 컨텍스트 없음")
+
+        # special_context 추가 (특별 상황 처리)
+        if special_context:
+            final_system_prompt += f"\n\n{special_context}"
+            print(f"📝 특별 상황 감지됨")
+        else:
+            # special_context가 없으면 일반 대화 모드 강조
+            final_system_prompt += "\n\n## 일반 대화 모드\nuser와 자연스럽게 대화해. 친근하게 질문하고 관심 보여줘."
+            print(f"📝 일반 대화 모드")
 
         # 3. 시스템 메시지 처리
         # 현재 메시지 목록에 시스템 메시지가 없거나, 다른 페르소나의 메시지일 수 있으므로
@@ -333,7 +369,7 @@ class ChipiBrain:
 # 실행 테스트
 # ==========================================
 if __name__ == "__main__":
-    manager = JarvisMemoryManager()
+    manager = ChipiBrain()
     
     # 1. 메모리 초기화 (새로운 대화 시작)
     manager.create_new_memory()
@@ -342,46 +378,3 @@ if __name__ == "__main__":
 
     # 디바이스 시리얼 (env에서 자동 읽음)
     device_serial = os.environ.get("DEVICE_SERIAL")
-
-    if not device_serial:
-        print("❌ DEVICE_SERIAL이 .env에 설정되지 않았습니다.")
-    else:
-        print(f"✓ 디바이스 시리얼: {device_serial}")
-
-        # 대화 1 (자동으로 대화 이어가기 포함)
-        user_input = "안녕, 너는 누구니?"
-        manager.add_msg(user_input)
-        print(f"User: {user_input}")
-        response = manager.wait_run('chipi', device_serial=device_serial)
-        print(f"Chipi: {response}")
-        print("-" * 20)
-
-        # 대화 2 (자동으로 대화 이어가기 포함)
-        user_input = "오늘 회사 김부장 진짜 짜증나"
-        manager.add_msg(user_input)
-        print(f"User: {user_input}")
-        response = manager.wait_run('chipi', device_serial=device_serial)
-        print(f"Chipi: {response}")
-        print("-" * 20)
-
-        # 대화 3 (자동으로 대화 이어가기 포함)
-        user_input = "물 줄게"
-        manager.add_msg(user_input)
-        print(f"User: {user_input}")
-        response = manager.wait_run('chipi', device_serial=device_serial)
-        print(f"Chipi: {response}")
-        print("-" * 20)
-
-        # 대화 4 (자동으로 대화 이어가기 포함)
-        user_input = "지금 온도 어때?"
-        manager.add_msg(user_input)
-        print(f"User: {user_input}")
-        response = manager.wait_run('chipi', device_serial=device_serial)
-        print(f"Chipi: {response}")
-
-        # 대화 5 (자동으로 대화 이어가기 포함)
-        user_input = "지금 습도 어때?"
-        manager.add_msg(user_input)
-        print(f"User: {user_input}")
-        response = manager.wait_run('chipi', device_serial=device_serial)
-        print(f"Chipi: {response}")

@@ -29,8 +29,8 @@ def main():
             "voice": "ko-KR-SeoHyeonNeural",
             "style": "cheerful",
             "style_degree": 2.0,
-            "pitch": 10,  
-            "rate": 20
+            "pitch": 15,  
+            "rate": 30
         }
 
         tts.speak("준비됐어! 말 걸어줘!", chipi_params)
@@ -49,6 +49,7 @@ def main():
 
             # 2. 생각하기
             print("🧠 생각하는 중...", end=" ", flush=True)
+            brain.add_msg(user_text)
             ai_response = brain.wait_run(ai_name='chipi', device_serial=device_serial)
             print("✅ 완료", flush=True)
             

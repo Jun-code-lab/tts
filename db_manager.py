@@ -12,7 +12,7 @@ class DatabaseManager:
         # 데이터베이스 연결 정보
         self.host = os.environ.get("DB_HOST")
         self.port = os.environ.get("DB_PORT", "5432")
-        self.database = os.environ.get("DB_NAME", "postgres")
+        self.database = os.environ.get("DB_NAME", "chytonpide_production")
         self.user = os.environ.get("DB_USER", "postgres")
         self.password = os.environ.get("DB_PASSWORD")
 
